@@ -11,7 +11,8 @@ const getMetrics = async () => {
         cpu: 0,
         ram: { total: 0, used: 0, percent: 0 },
         disk: { total: 0, used: 0, percent: 0 },
-        gpu: []
+        gpu: [],
+        processes: []
     };
 
     try {
@@ -68,6 +69,13 @@ const getMetrics = async () => {
             } catch (e) {}
         }
 
+        // Processes
+        const psRaw = await execPromise("ps -eo pid,ppid,%cpu,%mem,comm --sort=-%cpu | head -11 | tail -n +2");
+        metrics.processes = psRaw.trim().split('\n').map(line => {
+            const [pid, ppid, cpu, mem, comm] = line.trim().split(/\s+/);
+            return { pid, cpu: parseFloat(cpu), mem: parseFloat(mem), name: comm };
+        });
+
     } catch (err) {
         console.error("Error gathering metrics:", err);
     }
@@ -85,6 +93,17 @@ const execPromise = (cmd) => {
 };
 
 const server = http.createServer(async (req, res) => {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
     if (req.url === '/api/metrics' && req.method === 'GET') {
         const metrics = await getMetrics();
         res.writeHead(200, { 'Content-Type': 'application/json' });

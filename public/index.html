@@ -62,12 +62,47 @@
                 </div>
             </section>
 
-            <!-- Quick Actions -->
-            <section class="quick-actions">
-                <button onclick="runCmd('top -bn1 | head -20')" class="glass">Top Processes</button>
-                <button onclick="runCmd('who')" class="glass">Active Users</button>
-                <button onclick="runCmd('last -n 5')" class="glass">Last Logins</button>
-                <button onclick="runCmd('systemctl list-units --type=service --state=running | head -15')" class="glass">Running Services</button>
+            <!-- Quick Actions & Custom Macros -->
+            <section class="actions-container">
+                <div class="quick-actions">
+                    <h3>Built-in Actions</h3>
+                    <div class="action-grid">
+                        <button onclick="runCmd('top -bn1 | head -20')" class="glass">Top Processes</button>
+                        <button onclick="runCmd('who')" class="glass">Active Users</button>
+                        <button onclick="runCmd('last -n 5')" class="glass">Last Logins</button>
+                        <button onclick="runCmd('systemctl list-units --type=service --state=running | head -15')" class="glass">Running Services</button>
+                    </div>
+                </div>
+
+                <div class="custom-macros">
+                    <div class="macro-header">
+                        <h3>Custom Macros</h3>
+                        <button id="add-macro-btn" class="glass small-btn">+ Add Macro</button>
+                    </div>
+                    <div id="macro-grid" class="action-grid">
+                        <!-- Custom macros will be injected here -->
+                    </div>
+                </div>
+            </section>
+            <!-- Processes -->
+            <section class="processes card glass">
+                <h3>Top Processes</h3>
+                <div class="table-wrapper">
+                    <table id="process-table">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>Name</th>
+                                <th>CPU %</th>
+                                <th>MEM %</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="process-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
             </section>
         </main>
 
@@ -76,6 +111,36 @@
                 <span id="uptime-val">Scanning...</span>
             </div>
         </footer>
+    </div>
+
+    <!-- Add Macro Modal -->
+    <div id="macro-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <h2>Add Custom Macro</h2>
+            <div class="form-group">
+                <label for="macro-name">Button Name</label>
+                <input type="text" id="macro-name" placeholder="e.g., Restart Nginx">
+            </div>
+            <div class="form-group">
+                <label for="macro-type">Action Type</label>
+                <select id="macro-type" class="glass-input">
+                    <option value="server">Server Command (Bash)</option>
+                    <option value="client">Client Script (JavaScript)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="macro-cmd">Command / Script</label>
+                <textarea id="macro-cmd" rows="4" placeholder="e.g., sudo systemctl restart nginx"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="macro-color">Button Color (HSL/Hex)</label>
+                <input type="text" id="macro-color" placeholder="e.g., #f43f5e" value="var(--glass-bg)">
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-macro-btn" class="glass">Cancel</button>
+                <button id="save-macro-btn">Save Macro</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
