@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servboard | Premium Server Remote</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-container">
+        <header>
+            <h1>Servboard <span class="badge">Live</span></h1>
+            <p id="server-status">Connecting...</p>
+        </header>
+
+        <main class="dashboard">
+            <!-- System Stats -->
+            <section class="stats-grid">
+                <div class="card glass">
+                    <h3>CPU Usage</h3>
+                    <div class="progress-container">
+                        <div id="cpu-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <span id="cpu-val" class="stat-val">0%</span>
+                </div>
+
+                <div class="card glass">
+                    <h3>RAM Usage</h3>
+                    <div class="progress-container">
+                        <div id="ram-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <span id="ram-val" class="stat-val">0 / 0 MB</span>
+                </div>
+
+                <div class="card glass">
+                    <h3>Disk Space</h3>
+                    <div class="progress-container">
+                        <div id="disk-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <span id="disk-val" class="stat-val">0 / 0 GB</span>
+                </div>
+
+                <div id="gpu-container" class="card glass hidden">
+                    <h3>GPU Usage</h3>
+                    <div class="progress-container">
+                        <div id="gpu-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <span id="gpu-val" class="stat-val">0%</span>
+                </div>
+            </section>
+
+            <!-- Remote Execution -->
+            <section class="remote-control card glass">
+                <h3>Remote Execution</h3>
+                <div class="console-wrapper">
+                    <pre id="console-output">Ready for command...</pre>
+                    <div class="input-group">
+                        <input type="text" id="cmd-input" placeholder="Enter command (e.g. uptime, df -h)..." autocomplete="off">
+                        <button id="run-btn">Run</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <button onclick="runCmd('top -bn1 | head -20')" class="glass">Top Processes</button>
+                <button onclick="runCmd('who')" class="glass">Active Users</button>
+                <button onclick="runCmd('last -n 5')" class="glass">Last Logins</button>
+                <button onclick="runCmd('systemctl list-units --type=service --state=running | head -15')" class="glass">Running Services</button>
+            </section>
+        </main>
+
+        <footer>
+            <div class="uptime-strip">
+                <span id="uptime-val">Scanning...</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

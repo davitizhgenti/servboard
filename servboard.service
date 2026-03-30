@@ -1,0 +1,14 @@
+[Unit]
+Description=Servboard - Remote Server Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=ed
+WorkingDirectory=/home/ed/Davit/Projects/Servboard
+ExecStart=/usr/bin/node server.js
+Restart=always
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
