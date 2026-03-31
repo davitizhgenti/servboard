@@ -1,0 +1,6 @@
+flet
+psutil
+fastapi
+uvicorn
+requests
+python-multipart

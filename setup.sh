@@ -3,12 +3,17 @@
 # Servboard Setup Script
 echo "--- Servboard Setup starting ---"
 
-# Check for Node.js
-if ! command -v node &> /dev/null
+# Check for Python3
+if ! command -v python3 &> /dev/null
 then
-    echo "Node.js is not installed. Please install it first."
+    echo "Python3 is not installed. Please install it first."
     exit 1
 fi
+
+# Install dependencies
+echo "Installing Python dependencies..."
+pip3 install -r requirements.txt
+
 
 # Create directory structure
 mkdir -p public
@@ -28,4 +33,6 @@ echo "sudo systemctl enable servboard"
 echo "sudo systemctl start servboard"
 
 echo "--- Setup Complete ---"
-echo "Run 'node server.js' to test immediately."
+echo "Run 'python3 main.py' to test immediately."
+
+
