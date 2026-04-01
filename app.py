@@ -221,11 +221,11 @@ class ServboardApp:
                 ft.Container(height=40),
                 card(ft.Column([
                     ft.TextField(ref=server_ref, label="Server URL", value=self.api.base_url,
-                                 prefix_icon=ft.icons.DNS, border_color="#30363d", focused_border_color=ACCENT),
+                                 prefix_icon=ft.Icons.DNS, border_color="#30363d", focused_border_color=ACCENT),
                     ft.TextField(ref=username_ref, label="Username",
-                                 prefix_icon=ft.icons.PERSON, border_color="#30363d", focused_border_color=ACCENT),
+                                 prefix_icon=ft.Icons.PERSON, border_color="#30363d", focused_border_color=ACCENT),
                     ft.TextField(ref=password_ref, label="Password", password=True, can_reveal_password=True,
-                                 prefix_icon=ft.icons.LOCK, border_color="#30363d", focused_border_color=ACCENT,
+                                 prefix_icon=ft.Icons.LOCK, border_color="#30363d", focused_border_color=ACCENT,
                                  on_submit=submit),
                     ft.Text(ref=status_ref, value="", color=DANGER, size=12),
                     submit_btn,
@@ -247,10 +247,10 @@ class ServboardApp:
         # Bottom Nav
         self.nav = ft.NavigationBar(
             destinations=[
-                ft.NavigationBarDestination(icon=ft.icons.DASHBOARD_OUTLINED, selected_icon=ft.icons.DASHBOARD, label="Dashboard"),
-                ft.NavigationBarDestination(icon=ft.icons.GRID_VIEW_OUTLINED, selected_icon=ft.icons.GRID_VIEW, label="Remote"),
-                ft.NavigationBarDestination(icon=ft.icons.FOLDER_OUTLINED, selected_icon=ft.icons.FOLDER, label="Scripts"),
-                ft.NavigationBarDestination(icon=ft.icons.SETTINGS_OUTLINED, selected_icon=ft.icons.SETTINGS, label="Settings"),
+                ft.NavigationBarDestination(icon=ft.Icons.DASHBOARD_OUTLINED, selected_icon=ft.Icons.DASHBOARD, label="Dashboard"),
+                ft.NavigationBarDestination(icon=ft.Icons.GRID_VIEW_OUTLINED, selected_icon=ft.Icons.GRID_VIEW, label="Remote"),
+                ft.NavigationBarDestination(icon=ft.Icons.FOLDER_OUTLINED, selected_icon=ft.Icons.FOLDER, label="Scripts"),
+                ft.NavigationBarDestination(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label="Settings"),
             ],
             selected_index=0,
             bgcolor=SURFACE,
@@ -396,7 +396,7 @@ class ServboardApp:
 
         header = ft.Row([
             ft.Text("REMOTE", size=13, color=MUTED, weight=ft.FontWeight.BOLD),
-            ft.IconButton(ft.icons.ADD_CIRCLE_OUTLINE, icon_color=ACCENT, on_click=add_page, tooltip="Add Page")
+            ft.IconButton(ft.Icons.ADD_CIRCLE_OUTLINE, icon_color=ACCENT, on_click=add_page, tooltip="Add Page")
         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
 
         if not pages:
@@ -404,7 +404,7 @@ class ServboardApp:
                 header,
                 ft.Container(
                     content=ft.Column([
-                        ft.Icon(ft.icons.GRID_VIEW_OUTLINED, size=48, color=MUTED),
+                        ft.Icon(ft.Icons.GRID_VIEW_OUTLINED, size=48, color=MUTED),
                         ft.Text("No pages yet", size=16, color=MUTED),
                         ft.Text("Create a page to add buttons", size=12, color=MUTED),
                         ft.ElevatedButton("Create First Page", on_click=add_page,
@@ -432,7 +432,8 @@ class ServboardApp:
             return ft.Container(
                 content=ft.Column([
                     ft.IconButton(
-                        icon=getattr(ft.icons, b["icon"].upper(), ft.icons.PLAY_ARROW),
+                        icon=getattr(ft.Icons, b["icon"].upper(), ft.Icons.PLAY_ARROW),
+
                         icon_size=32, icon_color=ft.Colors.WHITE,
                         on_click=lambda e, c=b["command"]: run_button(c),
                         style=ft.ButtonStyle(bgcolor={ft.ControlState.DEFAULT: b["color"]},
@@ -498,12 +499,12 @@ class ServboardApp:
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.IconButton(ft.icons.ADD, icon_color=ACCENT, tooltip="Add Button", on_click=add_button),
-                    ft.IconButton(ft.icons.DELETE_OUTLINE, icon_color=DANGER, tooltip="Delete Page", on_click=delete_page),
+                    ft.IconButton(ft.Icons.ADD, icon_color=ACCENT, tooltip="Add Button", on_click=add_button),
+                    ft.IconButton(ft.Icons.DELETE_OUTLINE, icon_color=DANGER, tooltip="Delete Page", on_click=delete_page),
                 ], alignment=ft.MainAxisAlignment.END),
                 grid if buttons else ft.Container(
                     content=ft.Column([
-                        ft.Icon(ft.icons.TOUCH_APP_OUTLINED, size=40, color=MUTED),
+                        ft.Icon(ft.Icons.TOUCH_APP_OUTLINED, size=40, color=MUTED),
                         ft.Text("No buttons yet", color=MUTED),
                         ft.TextButton("Add Button", on_click=add_button)
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=6),
@@ -522,7 +523,7 @@ class ServboardApp:
             self.content_area.controls.append(
                 ft.Container(
                     content=ft.Column([
-                        ft.Icon(ft.icons.FOLDER_OPEN, size=48, color=MUTED),
+                        ft.Icon(ft.Icons.FOLDER_OPEN, size=48, color=MUTED),
                         ft.Text("No scripts found", color=MUTED),
                         ft.Text(f"Add .sh files to {self.api.base_url}", color=MUTED, size=12)
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=8),
@@ -551,7 +552,7 @@ class ServboardApp:
                             ft.Text(item["name"], size=14, weight=ft.FontWeight.W_500, color=TEXT),
                             ft.Text(item["path"], size=10, color=MUTED)
                         ], expand=True, spacing=2),
-                        ft.IconButton(ft.icons.PLAY_CIRCLE_FILLED, icon_color=ACCENT, on_click=run_script, tooltip="Run")
+                        ft.IconButton(ft.Icons.PLAY_CIRCLE_FILLED, icon_color=ACCENT, on_click=run_script, tooltip="Run")
                     ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                     padding=ft.padding.symmetric(horizontal=12, vertical=8)
                 ))
