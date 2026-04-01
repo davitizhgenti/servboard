@@ -87,7 +87,8 @@ SUCCESS = "#3fb950"
 
 def card(content, padding=16, radius=12, color=SURFACE):
     return ft.Container(content=content, padding=padding, border_radius=radius, bgcolor=color,
-                        border=ft.border.all(1, "#30363d"))
+                        border=ft.Border.all(1, "#30363d"))
+
 
 def metric_gauge(label, value_ref, pct_ref, accent=ACCENT):
     """A circular progress gauge for metrics."""
@@ -163,8 +164,12 @@ class ServboardApp:
         self.page.controls.clear()
         self.page.padding = 20
 
+        # Labels based on mode
+        title = "Create Account" if self._register_mode else "Sign In"
+        desc = "Register for a new account" if self._register_mode else "Remote Server Control"
+        btn_text = "Create Account" if self._register_mode else "Sign In"
+        toggle_text = "Already have an account? Login" if self._register_mode else "Don't have an account? Register"
 
-        # Direct control references — no ft.Ref needed
         self._login_server = ft.TextField(
             label="Server URL", value=self.api.base_url,
             prefix_icon=ft.Icons.DNS, border_color="#30363d", focused_border_color=ACCENT
@@ -178,12 +183,12 @@ class ServboardApp:
             prefix_icon=ft.Icons.LOCK, border_color="#30363d", focused_border_color=ACCENT
         )
         self._login_status = ft.Text(value="", color=DANGER, size=12)
-        self._login_btn = ft.ElevatedButton(
-            "Sign In", on_click=self._do_login,
+
+        self._login_btn = ft.FilledButton(
+            btn_text, on_click=self._do_login,
             style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK,
                                  shape=ft.RoundedRectangleBorder(radius=8))
         )
-        self._toggle_btn = ft.TextButton("Switch to Register", on_click=self._toggle_login_mode)
 
         self._login_pw.on_submit = self._do_login
 
@@ -191,7 +196,7 @@ class ServboardApp:
             ft.Column([
                 ft.Container(height=60),
                 ft.Text("SERVBOARD", size=28, weight=ft.FontWeight.BOLD, color=ACCENT),
-                ft.Text("Remote Server Control", size=14, color=MUTED),
+                ft.Text(desc, size=14, color=MUTED),
                 ft.Container(height=40),
                 card(ft.Column([
                     self._login_server,
@@ -199,19 +204,19 @@ class ServboardApp:
                     self._login_pw,
                     self._login_status,
                     self._login_btn,
-                    ft.Row([self._toggle_btn], alignment=ft.MainAxisAlignment.CENTER)
+                    ft.Row([
+                        ft.TextButton(toggle_text, on_click=self._toggle_login_mode)
+                    ], alignment=ft.MainAxisAlignment.CENTER)
                 ], spacing=12), padding=24),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, width=400,
-               scroll=ft.ScrollMode.ADAPTIVE, expand=True),
+               scroll=ft.ScrollMode.ADAPTIVE),
         )
         self.page.update()
 
     def _toggle_login_mode(self, e):
         self._register_mode = not self._register_mode
-        self._toggle_btn.text = "Switch to Login" if self._register_mode else "Switch to Register"
-        self._login_btn.text = "Create Account" if self._register_mode else "Sign In"
-        self._login_status.value = ""
-        self.page.update()
+        self._build_login_ui()
+
 
     def _do_login(self, e):
         self._login_status.value = ""
