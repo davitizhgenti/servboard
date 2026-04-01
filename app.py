@@ -704,6 +704,10 @@ def main(page: ft.Page):
     ServboardApp(page)
 
 if __name__ == "__main__":
-    ft.app(target=main, port=3001)
+    ft.app(
+        target=main,
+        port=3001,
+        view=ft.AppView.WEB_BROWSER
+    )
 
 
