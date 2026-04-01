@@ -103,8 +103,14 @@ def metric_gauge(label, value_ref, pct_ref, accent=ACCENT):
     ])], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=4)
 
 def snack(page, msg, error=False):
-    page.open(ft.SnackBar(ft.Text(msg, color=ft.Colors.WHITE),
-                                  bgcolor=DANGER if error else "#238636"))
+    sb = ft.SnackBar(ft.Text(msg, color=ft.Colors.WHITE), bgcolor=DANGER if error else "#238636")
+    try:
+        page.open(sb)
+    except:
+        page.snack_bar = sb
+        sb.open = True
+        page.update()
+
 
 
 # ─── Main App ─────────────────────────────────────────────────────────────────
@@ -713,10 +719,26 @@ class ServboardApp:
                 ft.Text("Enter your sudo password to execute this command.", size=12, color=MUTED),
                 pw_field
             ], tight=True, spacing=8),
-            actions=[ft.TextButton("Cancel", on_click=lambda e: self.page.close(dlg)),
+            actions=[ft.TextButton("Cancel", on_click=lambda e: self._close_adaptive(dlg)),
                      ft.TextButton("Run", on_click=submit)]
         )
-        self.page.open(dlg)
+        self._open_adaptive(dlg)
+
+    def _open_adaptive(self, control):
+        try:
+            self.page.open(control)
+        except:
+            self.page.dialog = control
+            control.open = True
+            self.page.update()
+
+    def _close_adaptive(self, control):
+        try:
+            self.page.close(control)
+        except:
+            control.open = False
+            self.page.update()
+
 
 
 
