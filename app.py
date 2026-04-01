@@ -387,10 +387,8 @@ class ServboardApp:
             selected_index=0,
             animation_duration=200,
             expand=True,
-            label_color=ACCENT,
-            unselected_label_color=MUTED,
-            indicator_color=ACCENT,
         )
+
 
 
         for p in pages:
