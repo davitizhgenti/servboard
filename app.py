@@ -262,7 +262,8 @@ class ServboardApp:
         self.page.controls.clear()
         self.polling = True
 
-        self.content_area = ft.Column(expand=True, scroll=ft.ScrollMode.ADAPTIVE, spacing=16, padding=16)
+        self.content_area = ft.Column(expand=True, scroll=ft.ScrollMode.ADAPTIVE, spacing=16)
+
 
         # Bottom Nav
         self.nav = ft.NavigationBar(
@@ -279,8 +280,12 @@ class ServboardApp:
         )
 
         self.page.add(
-            ft.Column([self.content_area, self.nav], expand=True, spacing=0)
+            ft.Column([
+                ft.Container(content=self.content_area, padding=16, expand=True),
+                self.nav
+            ], expand=True, spacing=0)
         )
+
 
         self._show_dashboard()
         asyncio.create_task(self._metrics_poll())
