@@ -103,10 +103,9 @@ def metric_gauge(label, value_ref, pct_ref, accent=ACCENT):
     ])], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=4)
 
 def snack(page, msg, error=False):
-    page.snack_bar = ft.SnackBar(ft.Text(msg, color=ft.Colors.WHITE),
-                                  bgcolor=DANGER if error else "#238636")
-    page.snack_bar.open = True
-    page.update()
+    page.open(ft.SnackBar(ft.Text(msg, color=ft.Colors.WHITE),
+                                  bgcolor=DANGER if error else "#238636"))
+
 
 # ─── Main App ─────────────────────────────────────────────────────────────────
 class ServboardApp:
@@ -704,20 +703,21 @@ class ServboardApp:
         pw_field = ft.TextField(label="Sudo Password", password=True, can_reveal_password=True, autofocus=True)
         def submit(e):
             self.sudo_password = pw_field.value
-            self._close_dialog()
+            self.page.close(dlg)
             callback(self.sudo_password)
         pw_field.on_submit = submit
-        self.page.dialog = ft.AlertDialog(
+        
+        dlg = ft.AlertDialog(
             title=ft.Text("Sudo Required"),
             content=ft.Column([
                 ft.Text("Enter your sudo password to execute this command.", size=12, color=MUTED),
                 pw_field
             ], tight=True, spacing=8),
-            actions=[ft.TextButton("Cancel", on_click=lambda e: self._close_dialog()),
+            actions=[ft.TextButton("Cancel", on_click=lambda e: self.page.close(dlg)),
                      ft.TextButton("Run", on_click=submit)]
         )
-        self.page.dialog.open = True
-        self.page.update()
+        self.page.open(dlg)
+
 
 
     def _exec(self, command, sudo_password):
