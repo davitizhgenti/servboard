@@ -9,7 +9,8 @@ import requests
 import asyncio
 import json
 import time
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
+
 
 # ─── API Client ───────────────────────────────────────────────────────────────
 class ApiClient:
@@ -130,11 +131,17 @@ class ServboardApp:
 
         # Update API base URL if it's currently localhost but the page says otherwise
         # This helps in remote environments where localhost:3001 is common
-        if "localhost" in self.api.base_url and self.page.host and "localhost" not in self.page.host:
-             # Port 3000 is the hardcoded API port on the server
-             self.api.base_url = f"http://{self.page.host}:3000"
+        if "localhost" in self.api.base_url and self.page.url:
+             try:
+                 p = urlparse(self.page.url)
+                 if p.hostname and "localhost" not in p.hostname:
+                      # Port 3000 is the hardcoded API port on the server
+                      self.api.base_url = f"http://{p.hostname}:3000"
+             except Exception:
+                 pass
 
         self.user = None
+
 
         self.sudo_password = ""
         self.current_page_id = None
