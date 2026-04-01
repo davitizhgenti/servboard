@@ -232,8 +232,7 @@ class ServboardApp:
                     ft.Row([toggle_btn], alignment=ft.MainAxisAlignment.CENTER)
                 ], spacing=12), padding=24),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, width=400,
-               scroll=ft.ScrollMode.ADAPTIVE),
-            expand=True
+               scroll=ft.ScrollMode.ADAPTIVE, expand=True),
         )
         self.page.update()
 
