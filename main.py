@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional, List
-import psutil, os, subprocess, uvicorn, platform, time
+import psutil, os, subprocess, uvicorn, platform, time, bcrypt
 
 
 # ─── Config ───────────────────────────────────────────────────────────────────
@@ -71,11 +71,23 @@ class Preference(Base):
 Base.metadata.create_all(bind=engine)
 
 # ─── Auth Helpers ─────────────────────────────────────────────────────────────
-pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
-def verify_password(plain, hashed): return pwd_ctx.verify(plain, hashed)
-def hash_password(password): return pwd_ctx.hash(password)
+def hash_password(password: str):
+    # Bcrypt requires bytes and has a 72-byte limit
+    pwd_bytes = password.encode('utf-8')[:72]
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
+
+def verify_password(plain_password: str, hashed_password: str):
+    try:
+        return bcrypt.checkpw(
+            plain_password.encode('utf-8')[:72],
+            hashed_password.encode('utf-8')
+        )
+    except Exception:
+        return False
+
 
 def create_token(data: dict):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
