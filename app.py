@@ -143,8 +143,10 @@ class ServboardApp:
         self.sys_info_text = ft.Ref[ft.Text]()
         self.proc_list = ft.Ref[ft.DataTable]()
         self.console_ref = ft.Ref[ft.Text]()
+        self._register_mode = False
 
         self._check_auth()
+
 
     def _check_auth(self):
         if self.api.token:
@@ -160,7 +162,7 @@ class ServboardApp:
     def _build_login_ui(self):
         self.page.controls.clear()
         self.page.padding = 20
-        self._register_mode = False
+
 
         # Direct control references — no ft.Ref needed
         self._login_server = ft.TextField(
