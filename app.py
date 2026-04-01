@@ -386,12 +386,12 @@ class ServboardApp:
         page_tabs = ft.Tabs(
             selected_index=0,
             animation_duration=200,
-            tabs=[],
             expand=True,
             label_color=ACCENT,
             unselected_label_color=MUTED,
             indicator_color=ACCENT,
         )
+
 
         for p in pages:
             page_tabs.tabs.append(ft.Tab(
