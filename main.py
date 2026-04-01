@@ -142,14 +142,6 @@ app = FastAPI(title="Servboard API", version="2.0")
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-# Fix CSP blocked errors from Flet's strict default policy
-@app.middleware("http")
-async def open_csp_middleware(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["Content-Security-Policy"] = (
-        "default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;"
-    )
-    return response
 
 
 # ─── Auth Routes ──────────────────────────────────────────────────────────────
