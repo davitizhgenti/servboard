@@ -5,6 +5,8 @@ Provides: JWT Auth, per-user SQLite data, metrics, secure command execution.
 
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, Text, DateTime
 from sqlalchemy.orm import declarative_base
@@ -139,6 +141,17 @@ class PrefsUpdate(BaseModel):
 app = FastAPI(title="Servboard API", version="2.0")
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+# Fix CSP blocked errors from Flet's strict default policy
+class OpenCSPMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["Content-Security-Policy"] = (
+            "default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;"
+        )
+        return response
+
+app.add_middleware(OpenCSPMiddleware)
 
 # ─── Auth Routes ──────────────────────────────────────────────────────────────
 @app.post("/api/auth/register", status_code=201)
@@ -346,10 +359,8 @@ def update_prefs(req: PrefsUpdate, user: User = Depends(get_current_user), db: S
 # ─── Mount Flet App ───────────────────────────────────────────────────────────
 import app as flet_app
 
-app.mount("/", flet_fastapi.app(
-    flet_app.main,
-    content_security_policy="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;"
-))
+app.mount("/", flet_fastapi.app(flet_app.main))
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("FLET_SERVER_PORT", 3000))
