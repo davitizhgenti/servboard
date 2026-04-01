@@ -6,8 +6,9 @@ cd "$SCRIPT_DIR"
 PYTHON="$SCRIPT_DIR/.venv/bin/python3"
 
 echo "[Servboard] Cleaning up old processes on ports 3000/3001..."
-sudo fuser -k 3000/tcp 3001/tcp 2>/dev/null || true
+fuser -k 3000/tcp 3001/tcp 2>/dev/null || true
 sleep 1
+
 
 echo "[Servboard] Starting API server on port 3000..."
 "$PYTHON" main.py > api.log 2>&1 &
