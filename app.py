@@ -712,6 +712,5 @@ def main(page: ft.Page):
     app._on_connect(None)
 
 if __name__ == "__main__":
-    ft.app(target=main,
-           view=ft.AppView.WEB_BROWSER if __import__("os").environ.get("WEB_MODE") else ft.AppView.FLET_APP,
-           port=int(__import__("os").environ.get("FLET_SERVER_PORT", 3000)))
+    ft.app(target=main, port=3001)
+
