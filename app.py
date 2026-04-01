@@ -387,7 +387,10 @@ class ServboardApp:
             selected_index=0,
             animation_duration=200,
             expand=True,
+            length=len(pages),
+            content=ft.Column(expand=True),
         )
+
 
 
 
