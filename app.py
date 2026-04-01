@@ -434,10 +434,10 @@ class ServboardApp:
                         ft.Icon(ft.Icons.GRID_VIEW_OUTLINED, size=48, color=MUTED),
                         ft.Text("No pages yet", size=16, color=MUTED),
                         ft.Text("Create a page to add buttons", size=12, color=MUTED),
-                        ft.ElevatedButton("Create First Page", on_click=add_page,
+                        ft.FilledButton("Create First Page", on_click=add_page,
                                           style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK)),
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=8),
-                    expand=True, alignment=ft.alignment.center, height=300
+                    expand=True, alignment=ft.Alignment(0, 0), height=300
                 )
             ]
         else:
@@ -532,7 +532,7 @@ class ServboardApp:
                         ft.Text("No buttons yet", color=MUTED),
                         ft.TextButton("Add Button", on_click=add_button)
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=6),
-                    height=200, alignment=ft.alignment.center
+                    height=200, alignment=ft.Alignment(0, 0)
                 )
             ], spacing=8),
             padding=12
@@ -551,7 +551,7 @@ class ServboardApp:
                         ft.Text("No scripts found", color=MUTED),
                         ft.Text(f"Add .sh files to {self.api.base_url}", color=MUTED, size=12)
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=8),
-                    height=300, alignment=ft.alignment.center
+                    height=300, alignment=ft.Alignment(0, 0)
                 )
             )
             self.page.update()
@@ -561,7 +561,7 @@ class ServboardApp:
         for category, items in scripts.items():
             tiles.append(ft.Container(
                 content=ft.Text(category, size=11, color=MUTED, weight=ft.FontWeight.BOLD),
-                padding=ft.padding.only(top=12, bottom=4)
+                padding=ft.Padding(0, 12, 0, 4)
             ))
             for item in items:
                 def run_script(e, path=item["path"]):
@@ -578,7 +578,7 @@ class ServboardApp:
                         ], expand=True, spacing=2),
                         ft.IconButton(ft.Icons.PLAY_CIRCLE_FILLED, icon_color=ACCENT, on_click=run_script, tooltip="Run")
                     ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                    padding=ft.padding.symmetric(horizontal=12, vertical=8)
+                    padding=ft.Padding(12, 8, 12, 8)
                 ))
 
         self.content_area.controls += [
@@ -647,7 +647,7 @@ class ServboardApp:
                 url_field,
                 ft.Row([
                     ft.TextButton("Test Connection", on_click=test_connection),
-                    ft.ElevatedButton("Save", on_click=save_url,
+                    ft.FilledButton("Save", on_click=save_url,
                                       style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK))
                 ]),
                 status_text
