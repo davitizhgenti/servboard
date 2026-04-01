@@ -707,7 +707,9 @@ class ServboardApp:
 
 # ─── Entry Point ──────────────────────────────────────────────────────────────
 def main(page: ft.Page):
-    ServboardApp(page)
+    app = ServboardApp(page)
+    # Ensure it starts even if on_connect isn't triggered
+    app._on_connect(None)
 
 if __name__ == "__main__":
     ft.app(target=main,
