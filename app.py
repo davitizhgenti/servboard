@@ -166,52 +166,30 @@ class ServboardApp:
     def _build_login_ui(self):
         self.page.controls.clear()
         self.page.padding = 20
+        self._register_mode = False
 
-        username_ref = ft.Ref[ft.TextField]()
-        password_ref = ft.Ref[ft.TextField]()
-        server_ref = ft.Ref[ft.TextField]()
-        status_ref = ft.Ref[ft.Text]()
-        register_mode = [False]
+        # Direct control references — no ft.Ref needed
+        self._login_server = ft.TextField(
+            label="Server URL", value=self.api.base_url,
+            prefix_icon=ft.Icons.DNS, border_color="#30363d", focused_border_color=ACCENT
+        )
+        self._login_user = ft.TextField(
+            label="Username",
+            prefix_icon=ft.Icons.PERSON, border_color="#30363d", focused_border_color=ACCENT
+        )
+        self._login_pw = ft.TextField(
+            label="Password", password=True, can_reveal_password=True,
+            prefix_icon=ft.Icons.LOCK, border_color="#30363d", focused_border_color=ACCENT
+        )
+        self._login_status = ft.Text(value="", color=DANGER, size=12)
+        self._login_btn = ft.ElevatedButton(
+            "Sign In", on_click=self._do_login,
+            style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK,
+                                 shape=ft.RoundedRectangleBorder(radius=8))
+        )
+        self._toggle_btn = ft.TextButton("Switch to Register", on_click=self._toggle_login_mode)
 
-        def toggle_mode(e):
-            register_mode[0] = not register_mode[0]
-            toggle_btn.text = "Switch to Login" if register_mode[0] else "Switch to Register"
-            submit_btn.text = "Create Account" if register_mode[0] else "Sign In"
-            self.page.update()
-
-        def submit(e):
-            status_ref.current.value = ""
-            url = server_ref.current.value.strip()
-            user = username_ref.current.value.strip()
-            pw = password_ref.current.value
-
-            if not url or not user or not pw:
-                status_ref.current.value = "All fields required"
-                self.page.update()
-                return
-
-            self.api = ApiClient(url, "")
-            try:
-                if register_mode[0]:
-                    self.api.register(user, pw)
-                    status_ref.current.value = "Account created — signing in..."
-                    self.page.update()
-                result = self.api.login(user, pw)
-                token = result["access_token"]
-                self.api.token = token
-                self.page.client_storage.set("server_url", url)
-                self.page.client_storage.set("token", token)
-                self.user = self.api.me()
-                self.page.padding = 0
-                self._build_main_ui()
-            except ValueError as ex:
-                status_ref.current.value = str(ex)
-                self.page.update()
-
-        submit_btn = ft.ElevatedButton("Sign In", on_click=submit, expand=True,
-                                       style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK,
-                                                            shape=ft.RoundedRectangleBorder(radius=8)))
-        toggle_btn = ft.TextButton("Switch to Register", on_click=toggle_mode)
+        self._login_pw.on_submit = self._do_login
 
         self.page.add(
             ft.Column([
@@ -220,21 +198,63 @@ class ServboardApp:
                 ft.Text("Remote Server Control", size=14, color=MUTED),
                 ft.Container(height=40),
                 card(ft.Column([
-                    ft.TextField(ref=server_ref, label="Server URL", value=self.api.base_url,
-                                 prefix_icon=ft.Icons.DNS, border_color="#30363d", focused_border_color=ACCENT),
-                    ft.TextField(ref=username_ref, label="Username",
-                                 prefix_icon=ft.Icons.PERSON, border_color="#30363d", focused_border_color=ACCENT),
-                    ft.TextField(ref=password_ref, label="Password", password=True, can_reveal_password=True,
-                                 prefix_icon=ft.Icons.LOCK, border_color="#30363d", focused_border_color=ACCENT,
-                                 on_submit=submit),
-                    ft.Text(ref=status_ref, value="", color=DANGER, size=12),
-                    submit_btn,
-                    ft.Row([toggle_btn], alignment=ft.MainAxisAlignment.CENTER)
+                    self._login_server,
+                    self._login_user,
+                    self._login_pw,
+                    self._login_status,
+                    self._login_btn,
+                    ft.Row([self._toggle_btn], alignment=ft.MainAxisAlignment.CENTER)
                 ], spacing=12), padding=24),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, width=400,
                scroll=ft.ScrollMode.ADAPTIVE, expand=True),
         )
         self.page.update()
+
+    def _toggle_login_mode(self, e):
+        self._register_mode = not self._register_mode
+        self._toggle_btn.text = "Switch to Login" if self._register_mode else "Switch to Register"
+        self._login_btn.text = "Create Account" if self._register_mode else "Sign In"
+        self._login_status.value = ""
+        self.page.update()
+
+    def _do_login(self, e):
+        self._login_status.value = ""
+        url = self._login_server.value.strip()
+        user = self._login_user.value.strip()
+        pw = self._login_pw.value
+
+        if not url or not user or not pw:
+            self._login_status.value = "All fields required"
+            self.page.update()
+            return
+
+        self.api = ApiClient(url, "")
+        try:
+            if self._register_mode:
+                self.api.register(user, pw)
+                self._login_status.color = SUCCESS
+                self._login_status.value = "Account created — signing in..."
+                self.page.update()
+
+            result = self.api.login(user, pw)
+            token = result["access_token"]
+            self.api.token = token
+
+            try:
+                self.page.client_storage.set("server_url", url)
+                self.page.client_storage.set("token", token)
+            except Exception:
+                pass  # client_storage unavailable — session will still work
+
+            self.user = self.api.me()
+            self.page.padding = 0
+            self._build_main_ui()
+        except ValueError as ex:
+            self._login_status.color = DANGER
+            self._login_status.value = str(ex)
+            self.page.update()
+
+
 
     # ─── Main UI Shell ────────────────────────────────────────────────────────
     def _build_main_ui(self):
@@ -374,9 +394,9 @@ class ServboardApp:
             ))
 
         def add_page(e):
-            name_ref = ft.Ref[ft.TextField]()
+            name_field = ft.TextField(label="Page Name", autofocus=True)
             def save(ev):
-                name = name_ref.current.value.strip()
+                name = name_field.value.strip()
                 if not name: return
                 try:
                     self.api.create_page(name)
@@ -386,12 +406,13 @@ class ServboardApp:
 
             self.page.dialog = ft.AlertDialog(
                 title=ft.Text("New Page"),
-                content=ft.TextField(ref=name_ref, label="Page Name", autofocus=True),
+                content=name_field,
                 actions=[ft.TextButton("Cancel", on_click=lambda e: self._close_dialog()),
                          ft.TextButton("Create", on_click=save)]
             )
             self.page.dialog.open = True
             self.page.update()
+
 
         header = ft.Row([
             ft.Text("REMOTE", size=13, color=MUTED, weight=ft.FontWeight.BOLD),
@@ -445,37 +466,34 @@ class ServboardApp:
             )
 
         def add_button(e):
-            name_r = ft.Ref[ft.TextField]()
-            cmd_r = ft.Ref[ft.TextField]()
-            color_r = ft.Ref[ft.Dropdown]()
+            name_f = ft.TextField(label="Button Name", autofocus=True)
+            cmd_f = ft.TextField(label="Shell Command or Script Path")
+            color_f = ft.Dropdown(label="Color", value="#37474f", options=[
+                ft.dropdown.Option("#37474f", "Grey"),
+                ft.dropdown.Option("#1565c0", "Blue"),
+                ft.dropdown.Option("#2e7d32", "Green"),
+                ft.dropdown.Option("#b71c1c", "Red"),
+                ft.dropdown.Option("#4a148c", "Purple"),
+                ft.dropdown.Option("#e65100", "Orange"),
+            ])
 
             def save(ev):
                 try:
-                    self.api.create_button(pid, name=name_r.current.value,
-                                           command=cmd_r.current.value, color=color_r.current.value or "#37474f")
+                    self.api.create_button(pid, name=name_f.value,
+                                           command=cmd_f.value, color=color_f.value or "#37474f")
                     self._close_dialog()
                     self._show_remote()
                 except Exception as ex: snack(self.page, str(ex), error=True)
 
             self.page.dialog = ft.AlertDialog(
                 title=ft.Text(f"Add Button to {page_data['name']}"),
-                content=ft.Column([
-                    ft.TextField(ref=name_r, label="Button Name", autofocus=True),
-                    ft.TextField(ref=cmd_r, label="Shell Command or Script Path"),
-                    ft.Dropdown(ref=color_r, label="Color", value="#37474f", options=[
-                        ft.dropdown.Option("#37474f", "Grey"),
-                        ft.dropdown.Option("#1565c0", "Blue"),
-                        ft.dropdown.Option("#2e7d32", "Green"),
-                        ft.dropdown.Option("#b71c1c", "Red"),
-                        ft.dropdown.Option("#4a148c", "Purple"),
-                        ft.dropdown.Option("#e65100", "Orange"),
-                    ])
-                ], tight=True, spacing=10),
+                content=ft.Column([name_f, cmd_f, color_f], tight=True, spacing=10),
                 actions=[ft.TextButton("Cancel", on_click=lambda e: self._close_dialog()),
                          ft.TextButton("Add", on_click=save)]
             )
             self.page.dialog.open = True
             self.page.update()
+
 
         def delete_page(e):
             def confirm(ev):
@@ -568,36 +586,39 @@ class ServboardApp:
         prefs = self.api.prefs() or {}
         self._prefs = prefs
 
-        url_ref = ft.Ref[ft.TextField]()
-        status_ref = ft.Ref[ft.Text]()
+        url_field = ft.TextField(label="Server URL", value=self.api.base_url,
+                                 border_color="#30363d", focused_border_color=ACCENT)
+        status_text = ft.Text(value="", size=12)
 
         def test_connection(e):
-            health = ApiClient(url_ref.current.value).health()
+            health = ApiClient(url_field.value).health()
             if health:
-                status_ref.current.value = "✅ Connected"
-                status_ref.current.color = SUCCESS
+                status_text.value = "✅ Connected"
+                status_text.color = SUCCESS
             else:
-                status_ref.current.value = "❌ Cannot connect"
-                status_ref.current.color = DANGER
+                status_text.value = "❌ Cannot connect"
+                status_text.color = DANGER
             self.page.update()
 
         def save_url(e):
-            new_url = url_ref.current.value.strip()
+            new_url = url_field.value.strip()
             self.api = ApiClient(new_url, self.api.token)
-            self.page.client_storage.set("server_url", new_url)
+            try: self.page.client_storage.set("server_url", new_url)
+            except: pass
             snack(self.page, "Server URL saved")
 
         def change_sudo(e):
-            pw_ref = ft.Ref[ft.TextField]()
+            pw_field = ft.TextField(label="Sudo Password", password=True, can_reveal_password=True, autofocus=True)
             def save(ev):
-                self.sudo_password = pw_ref.current.value
+                self.sudo_password = pw_field.value
                 self._close_dialog()
                 snack(self.page, "Sudo password updated for this session")
+            pw_field.on_submit = save
             self.page.dialog = ft.AlertDialog(
                 title=ft.Text("Set Sudo Password"),
                 content=ft.Column([
                     ft.Text("This is used to authorize command execution.\nNot stored anywhere.", size=12, color=MUTED),
-                    ft.TextField(ref=pw_ref, label="Sudo Password", password=True, can_reveal_password=True, autofocus=True)
+                    pw_field
                 ], tight=True, spacing=8),
                 actions=[ft.TextButton("Cancel", on_click=lambda e: self._close_dialog()),
                          ft.TextButton("Set", on_click=save)]
@@ -607,7 +628,8 @@ class ServboardApp:
 
         def logout(e):
             self.polling = False
-            self.page.client_storage.remove("token")
+            try: self.page.client_storage.remove("token")
+            except: pass
             self.api.token = ""
             self._build_login_ui()
 
@@ -615,14 +637,13 @@ class ServboardApp:
             ft.Text("SETTINGS", size=13, color=MUTED, weight=ft.FontWeight.BOLD),
             card(ft.Column([
                 ft.Text("Server", size=12, color=MUTED, weight=ft.FontWeight.BOLD),
-                ft.TextField(ref=url_ref, label="Server URL", value=self.api.base_url,
-                             border_color="#30363d", focused_border_color=ACCENT),
+                url_field,
                 ft.Row([
                     ft.TextButton("Test Connection", on_click=test_connection),
                     ft.ElevatedButton("Save", on_click=save_url,
                                       style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK))
                 ]),
-                ft.Text(ref=status_ref, value="", size=12)
+                status_text
             ], spacing=10)),
             card(ft.Column([
                 ft.Text("Security", size=12, color=MUTED, weight=ft.FontWeight.BOLD),
@@ -640,24 +661,27 @@ class ServboardApp:
         ]
         self.page.update()
 
+
     # ─── Helpers ──────────────────────────────────────────────────────────────
     def _ask_sudo(self, callback):
-        pw_ref = ft.Ref[ft.TextField]()
+        pw_field = ft.TextField(label="Sudo Password", password=True, can_reveal_password=True, autofocus=True)
         def submit(e):
-            self.sudo_password = pw_ref.current.value
+            self.sudo_password = pw_field.value
             self._close_dialog()
             callback(self.sudo_password)
+        pw_field.on_submit = submit
         self.page.dialog = ft.AlertDialog(
             title=ft.Text("Sudo Required"),
             content=ft.Column([
                 ft.Text("Enter your sudo password to execute this command.", size=12, color=MUTED),
-                ft.TextField(ref=pw_ref, label="Sudo Password", password=True, can_reveal_password=True, autofocus=True, on_submit=submit)
+                pw_field
             ], tight=True, spacing=8),
             actions=[ft.TextButton("Cancel", on_click=lambda e: self._close_dialog()),
                      ft.TextButton("Run", on_click=submit)]
         )
         self.page.dialog.open = True
         self.page.update()
+
 
     def _exec(self, command, sudo_password):
         snack(self.page, f"Running: {command[:40]}...")
