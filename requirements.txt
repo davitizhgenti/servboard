@@ -1,6 +1,10 @@
 flet
 psutil
 fastapi
-uvicorn
+uvicorn[standard]
 requests
 python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+sqlalchemy
+slowapi
