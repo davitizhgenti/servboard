@@ -146,7 +146,22 @@ class ServboardApp:
         self.console_ref = ft.Ref[ft.Text]()
         self._register_mode = False
 
+        # Live session maintenance
+        asyncio.create_task(self._heartbeat())
+
         self._check_auth()
+
+    async def _heartbeat(self):
+        """Keep the websocket session alive periodically."""
+        while True:
+            try:
+                # Minimal activity to prevent timeout
+                self.page.title = "Servboard"
+                self.page.update()
+            except Exception:
+                pass
+            await asyncio.sleep(20)
+
 
 
     def _check_auth(self):
