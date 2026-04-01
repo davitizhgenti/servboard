@@ -117,10 +117,8 @@ class ServboardApp:
         self.page.fonts = {"Inter": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"}
         self.page.theme = ft.Theme(font_family="Inter")
 
-        # State
-        saved_url = self.page.client_storage.get("server_url") or "http://localhost:3000"
-        saved_token = self.page.client_storage.get("token") or ""
-        self.api = ApiClient(saved_url, saved_token)
+        # Defaults — will be updated after client_storage is ready
+        self.api = ApiClient("http://localhost:3000", "")
         self.user = None
         self.sudo_password = ""
         self.current_page_id = None
@@ -139,7 +137,21 @@ class ServboardApp:
         self.proc_list = ft.Ref[ft.DataTable]()
         self.console_ref = ft.Ref[ft.Text]()
 
+        # Defer auth check until after client_storage is available
+        self.page.on_connect = self._on_connect
+
+    def _on_connect(self, e):
+        """Called after the page session is established — client_storage is available here."""
+        try:
+            saved_url = self.page.client_storage.get("server_url") or "http://localhost:3000"
+            saved_token = self.page.client_storage.get("token") or ""
+        except Exception:
+            saved_url = "http://localhost:3000"
+            saved_token = ""
+        self.api = ApiClient(saved_url, saved_token)
         self._check_auth()
+
+
 
     def _check_auth(self):
         if self.api.token:
