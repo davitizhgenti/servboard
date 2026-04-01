@@ -721,8 +721,10 @@ if __name__ == "__main__":
         target=main,
         port=3001,
         host="0.0.0.0",
-        view=ft.AppView.WEB_BROWSER
+        view=ft.AppView.WEB_BROWSER,
+        web_renderer=ft.WebRenderer.HTML
     )
+
 
 
 
