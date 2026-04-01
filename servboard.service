@@ -8,10 +8,10 @@ User=user
 WorkingDirectory=/home/user/main/servboard
 ExecStart=/bin/bash start.sh
 Restart=always
-Environment=FLET_SERVER_PORT=3000
 Environment=WEB_MODE=1
 Environment=SCRIPTS_ROOT=/home/user/main
 Environment=SECRET_KEY=change-me-in-production-use-random-string
+
 
 
 
