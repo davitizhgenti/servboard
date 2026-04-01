@@ -216,7 +216,7 @@ class ServboardApp:
         self.page.add(
             ft.Column([
                 ft.Container(height=60),
-                ft.Text("SERVBOARD", size=28, weight=ft.FontWeight.BOLD, color=ACCENT, letter_spacing=4),
+                ft.Text("SERVBOARD", size=28, weight=ft.FontWeight.BOLD, color=ACCENT),
                 ft.Text("Remote Server Control", size=14, color=MUTED),
                 ft.Container(height=40),
                 card(ft.Column([
@@ -284,7 +284,7 @@ class ServboardApp:
         ], alignment=ft.MainAxisAlignment.SPACE_AROUND, wrap=True)
 
         sys_card = card(ft.Column([
-            ft.Text("SYSTEM", size=11, color=MUTED, letter_spacing=1, weight=ft.FontWeight.BOLD),
+            ft.Text("SYSTEM", size=11, color=MUTED, weight=ft.FontWeight.BOLD),
             ft.Text(ref=self.sys_info_text, value="Loading...", size=13, color=TEXT)
         ], spacing=6))
 
@@ -307,7 +307,7 @@ class ServboardApp:
             card(gauges, padding=20),
             sys_card,
             card(ft.Column([
-                ft.Text("TOP PROCESSES", size=11, color=MUTED, letter_spacing=1, weight=ft.FontWeight.BOLD),
+                ft.Text("TOP PROCESSES", size=11, color=MUTED, weight=ft.FontWeight.BOLD),
                 proc_table
             ], spacing=8)),
         ]
@@ -395,7 +395,7 @@ class ServboardApp:
             self.page.update()
 
         header = ft.Row([
-            ft.Text("REMOTE", size=13, color=MUTED, weight=ft.FontWeight.BOLD, letter_spacing=2),
+            ft.Text("REMOTE", size=13, color=MUTED, weight=ft.FontWeight.BOLD),
             ft.IconButton(ft.icons.ADD_CIRCLE_OUTLINE, icon_color=ACCENT, on_click=add_page, tooltip="Add Page")
         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
 
@@ -535,7 +535,7 @@ class ServboardApp:
         tiles = []
         for category, items in scripts.items():
             tiles.append(ft.Container(
-                content=ft.Text(category, size=11, color=MUTED, weight=ft.FontWeight.BOLD, letter_spacing=1),
+                content=ft.Text(category, size=11, color=MUTED, weight=ft.FontWeight.BOLD),
                 padding=ft.padding.only(top=12, bottom=4)
             ))
             for item in items:
@@ -557,7 +557,7 @@ class ServboardApp:
                 ))
 
         self.content_area.controls += [
-            ft.Text("SCRIPTS", size=13, color=MUTED, weight=ft.FontWeight.BOLD, letter_spacing=2),
+            ft.Text("SCRIPTS", size=13, color=MUTED, weight=ft.FontWeight.BOLD),
             *tiles
         ]
         self.page.update()
@@ -612,7 +612,7 @@ class ServboardApp:
             self._build_login_ui()
 
         self.content_area.controls += [
-            ft.Text("SETTINGS", size=13, color=MUTED, weight=ft.FontWeight.BOLD, letter_spacing=2),
+            ft.Text("SETTINGS", size=13, color=MUTED, weight=ft.FontWeight.BOLD),
             card(ft.Column([
                 ft.Text("Server", size=12, color=MUTED, weight=ft.FontWeight.BOLD),
                 ft.TextField(ref=url_ref, label="Server URL", value=self.api.base_url,
