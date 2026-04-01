@@ -127,7 +127,15 @@ class ServboardApp:
             saved_token = ""
 
         self.api = ApiClient(saved_url, saved_token)
+
+        # Update API base URL if it's currently localhost but the page says otherwise
+        # This helps in remote environments where localhost:3001 is common
+        if "localhost" in self.api.base_url and self.page.host and "localhost" not in self.page.host:
+             # Port 3000 is the hardcoded API port on the server
+             self.api.base_url = f"http://{self.page.host}:3000"
+
         self.user = None
+
         self.sudo_password = ""
         self.current_page_id = None
         self.polling = True
