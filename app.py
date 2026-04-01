@@ -76,7 +76,7 @@ class ApiClient:
     def update_prefs(self, **kwargs): return self._put("/api/prefs", json=kwargs)
 
 # ─── Colors & Styles ──────────────────────────────────────────────────────────
-ACCENT = ft.colors.CYAN_400
+ACCENT = ft.Colors.CYAN_400
 BG = "#0d1117"
 SURFACE = "#161b22"
 SURFACE2 = "#21262d"
@@ -101,7 +101,7 @@ def metric_gauge(label, value_ref, pct_ref, accent=ACCENT):
     ])], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=4)
 
 def snack(page, msg, error=False):
-    page.snack_bar = ft.SnackBar(ft.Text(msg, color=ft.colors.WHITE),
+    page.snack_bar = ft.SnackBar(ft.Text(msg, color=ft.Colors.WHITE),
                                   bgcolor=DANGER if error else "#238636")
     page.snack_bar.open = True
     page.update()
@@ -197,7 +197,7 @@ class ServboardApp:
                 self.page.update()
 
         submit_btn = ft.ElevatedButton("Sign In", on_click=submit, expand=True,
-                                       style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.colors.BLACK,
+                                       style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK,
                                                             shape=ft.RoundedRectangleBorder(radius=8)))
         toggle_btn = ft.TextButton("Switch to Register", on_click=toggle_mode)
 
@@ -243,7 +243,7 @@ class ServboardApp:
             selected_index=0,
             bgcolor=SURFACE,
             on_change=self._nav_change,
-            indicator_color=ft.colors.with_opacity(0.15, ACCENT)
+            indicator_color=ft.Colors.with_opacity(0.15, ACCENT)
         )
 
         self.page.add(
@@ -266,9 +266,9 @@ class ServboardApp:
 
         gauges = ft.Row([
             metric_gauge("CPU", self.cpu_val, self.cpu_pct, ACCENT),
-            metric_gauge("RAM", self.ram_val, self.ram_pct, ft.colors.PURPLE_400),
-            metric_gauge("DISK", self.disk_val, self.disk_pct, ft.colors.ORANGE_400),
-            metric_gauge("GPU", self.gpu_val, self.gpu_pct, ft.colors.GREEN_400),
+            metric_gauge("RAM", self.ram_val, self.ram_pct, ft.Colors.PURPLE_400),
+            metric_gauge("DISK", self.disk_val, self.disk_pct, ft.Colors.ORANGE_400),
+            metric_gauge("GPU", self.gpu_val, self.gpu_pct, ft.Colors.GREEN_400),
         ], alignment=ft.MainAxisAlignment.SPACE_AROUND, wrap=True)
 
         sys_card = card(ft.Column([
@@ -287,7 +287,7 @@ class ServboardApp:
             rows=[],
             column_spacing=16,
             data_row_min_height=32,
-            heading_row_color=ft.colors.with_opacity(0.05, ft.colors.WHITE),
+            heading_row_color=ft.Colors.with_opacity(0.05, ft.Colors.WHITE),
         )
 
         self.content_area.controls += [
@@ -396,7 +396,7 @@ class ServboardApp:
                         ft.Text("No pages yet", size=16, color=MUTED),
                         ft.Text("Create a page to add buttons", size=12, color=MUTED),
                         ft.ElevatedButton("Create First Page", on_click=add_page,
-                                          style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.colors.BLACK)),
+                                          style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK)),
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=8),
                     expand=True, alignment=ft.alignment.center, height=300
                 )
@@ -421,7 +421,7 @@ class ServboardApp:
                 content=ft.Column([
                     ft.IconButton(
                         icon=getattr(ft.icons, b["icon"].upper(), ft.icons.PLAY_ARROW),
-                        icon_size=32, icon_color=ft.colors.WHITE,
+                        icon_size=32, icon_color=ft.Colors.WHITE,
                         on_click=lambda e, c=b["command"]: run_button(c),
                         style=ft.ButtonStyle(bgcolor={ft.ControlState.DEFAULT: b["color"]},
                                              shape=ft.CircleBorder())
@@ -608,7 +608,7 @@ class ServboardApp:
                 ft.Row([
                     ft.TextButton("Test Connection", on_click=test_connection),
                     ft.ElevatedButton("Save", on_click=save_url,
-                                      style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.colors.BLACK))
+                                      style=ft.ButtonStyle(bgcolor=ACCENT, color=ft.Colors.BLACK))
                 ]),
                 ft.Text(ref=status_ref, value="", size=12)
             ], spacing=10)),
